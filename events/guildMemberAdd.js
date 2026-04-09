@@ -70,7 +70,7 @@ module.exports = {
             avatarShape: cfg.avatarShape || 'circle',
             font: cfg.font || 'gg sans',
             memberCount: member.guild.memberCount ?? member.guild.members.cache.size,
-            memberCountText: cfg.memberCountText ? render(cfg.memberCountText) : undefined
+            memberCountText: cfg.memberCountText === null || cfg.memberCountText === '' ? '' : render(cfg.memberCountText)
           });
           customImageAttachment = new AttachmentBuilder(imageBuffer, { name: 'welcome.png' });
         } catch (err) {
