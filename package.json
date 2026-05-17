@@ -1,6 +1,6 @@
 {
      "name": "bytebot",
-     "version": "1.6.1",
+     "version": "1.6.2",
      "description": "A powerful Discord bot featuring music, moderation, information commands, and fun utilities.",
      "main": "index.js",
      "scripts": {
