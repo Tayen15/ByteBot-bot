@@ -1,6 +1,6 @@
 {
      "name": "bytebot",
-     "version": "1.6.3",
+     "version": "1.6.4",
      "description": "A powerful Discord bot featuring music, moderation, information commands, and fun utilities.",
      "main": "index.js",
      "scripts": {
@@ -65,6 +65,9 @@
                "prisma",
                "sodium-native",
                "unrs-resolver"
-          ]
+          ],
+          "overrides": {
+               "@discordjs/opus": "npm:@vvo/empty-npm-package@1.0.0"
+          }
      }
 }
