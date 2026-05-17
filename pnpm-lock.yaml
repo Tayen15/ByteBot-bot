@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@discordjs/opus': npm:@vvo/empty-npm-package@1.0.0
+
 importers:
 
   .:
