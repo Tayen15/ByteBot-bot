@@ -446,17 +446,71 @@ router.get('/guild/:guildId/info', ensureAuthenticated, ensureBotInGuild, ensure
     }
 });
 
+// Get guild features (global toggles + guild-specific active states)
+router.get('/guild/:guildId/features', ensureAuthenticated, ensureBotInGuild, ensureGuildAdmin, async (req, res) => {
+    try {
+        const guild = req.currentGuild;
+        
+        // Parallel fetch for global feature toggles AND this guild's specific configurations
+        const [
+            globalFeatures,
+            prayer,
+            welcome,
+            rules,
+            alertsCount,
+            monitorsCount
+        ] = await Promise.all([
+            prisma.featureToggle.findMany(),
+            prisma.prayerTime.findFirst({ where: { guildId: req.dbGuild.id } }),
+            prisma.welcomeConfig.findUnique({ where: { guildId: req.dbGuild.id } }),
+            prisma.rule.findFirst({ where: { guildId: req.dbGuild.id } }),
+            prisma.socialAlert.count({ where: { guildId: req.dbGuild.id } }),
+            prisma.serverMonitoring.count({ where: { guildId: req.dbGuild.id } })
+        ]);
+
+        // Map global toggles
+        const globalConfig = globalFeatures.reduce((acc, f) => {
+            acc[f.featureKey] = f.enabled;
+            return acc;
+        }, {});
+
+        // Build feature states for the UI
+        const features = {
+            // Only enabled if globally enabled (default true if not defined)
+            prayer_times: globalConfig.prayer_times !== false,
+            welcome_message: globalConfig.welcome_message !== false,
+            rules_management: globalConfig.rules_management !== false,
+            social_alerts: globalConfig.social_alerts !== false,
+            server_monitoring: globalConfig.server_monitoring !== false,
+            
+            // Guild-specific active states — true if feature has been configured for this guild
+            active_states: {
+                 prayer_times: !!prayer,        // has prayer config (regardless of enabled flag)
+                 welcome_message: !!welcome,    // has welcome config
+                 rules_management: !!rules,     // has at least one rule
+                 social_alerts: alertsCount > 0,
+                 server_monitoring: monitorsCount > 0
+            }
+        };
+
+        res.json({ success: true, features });
+    } catch (error) {
+        console.error('[API] Error getting guild features:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // Get guild settings
 router.get('/guild/:guildId/settings', ensureAuthenticated, ensureBotInGuild, ensureGuildAdmin, async (req, res) => {
     try {
         const guild = req.currentGuild;
         let settings = await prisma.guildSettings.findUnique({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         if (!settings) {
             settings = await prisma.guildSettings.create({
-                data: { guildId: guild.id }
+                data: { guildId: req.dbGuild.id }
             });
         }
 
@@ -474,10 +528,10 @@ router.post('/guild/:guildId/settings', ensureAuthenticated, ensureBotInGuild, e
         const updates = req.body;
 
         const settings = await prisma.guildSettings.upsert({
-            where: { guildId: guild.id },
+            where: { guildId: req.dbGuild.id },
             update: updates,
             create: {
-                guildId: guild.id,
+                guildId: req.dbGuild.id,
                 ...updates
             }
         });
@@ -496,12 +550,12 @@ router.get('/guild/:guildId/prayer', ensureAuthenticated, ensureBotInGuild, ensu
     try {
         const guild = req.currentGuild;
         let prayerConfig = await prisma.prayerTime.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         if (!prayerConfig) {
             prayerConfig = await prisma.prayerTime.create({
-                data: { guildId: guild.id }
+                data: { guildId: req.dbGuild.id }
             });
         }
 
@@ -520,7 +574,7 @@ router.post('/guild/:guildId/prayer', ensureAuthenticated, ensureBotInGuild, ens
 
         // Get existing config to check if message needs to be deleted
         const existingConfig = await prisma.prayerTime.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         // Convert string booleans to actual booleans
@@ -565,14 +619,14 @@ router.post('/guild/:guildId/prayer', ensureAuthenticated, ensureBotInGuild, ens
         }
 
         const prayerConfig = await prisma.prayerTime.updateMany({
-            where: { guildId: guild.id },
+            where: { guildId: req.dbGuild.id },
             data
         });
 
         if (prayerConfig.count === 0) {
             await prisma.prayerTime.create({
                 data: {
-                    guildId: guild.id,
+                    guildId: req.dbGuild.id,
                     ...data
                 }
             });
@@ -614,7 +668,7 @@ router.get('/guild/:guildId/monitoring', ensureAuthenticated, ensureBotInGuild, 
     try {
         const guild = req.currentGuild;
         const monitors = await prisma.serverMonitoring.findMany({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         res.json({ success: true, monitors });
@@ -632,7 +686,7 @@ router.post('/guild/:guildId/monitoring', ensureAuthenticated, ensureBotInGuild,
 
         // Check if monitoring config exists
         const existing = await prisma.serverMonitoring.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         // Convert string booleans to actual booleans and integers
@@ -697,7 +751,7 @@ router.post('/guild/:guildId/monitoring', ensureAuthenticated, ensureBotInGuild,
             // Create new
             monitor = await prisma.serverMonitoring.create({
                 data: {
-                    guildId: guild.id,
+                    guildId: req.dbGuild.id,
                     ...data
                 }
             });
@@ -795,7 +849,7 @@ router.get('/guild/:guildId/rules', ensureAuthenticated, ensureBotInGuild, ensur
     try {
         const guild = req.currentGuild;
         const rulesConfig = await prisma.rule.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         res.json({ success: true, rulesConfig });
@@ -812,7 +866,7 @@ router.get('/guild/:guildId/rules', ensureAuthenticated, ensureBotInGuild, ensur
     try {
         const guild = req.currentGuild;
         const rulesConfig = await prisma.rule.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         res.json({
@@ -833,7 +887,7 @@ router.get('/guild/:guildId/rules/:ruleId', ensureAuthenticated, ensureBotInGuil
         const { ruleId } = req.params;
 
         const rulesConfig = await prisma.rule.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         if (!rulesConfig) {
@@ -865,7 +919,7 @@ router.post('/guild/:guildId/rules', ensureAuthenticated, ensureBotInGuild, ensu
         }
 
         const existing = await prisma.rule.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         const newRule = {
@@ -886,7 +940,7 @@ router.post('/guild/:guildId/rules', ensureAuthenticated, ensureBotInGuild, ensu
         } else {
             rulesConfig = await prisma.rule.create({
                 data: {
-                    guildId: guild.id,
+                    guildId: req.dbGuild.id,
                     rules: [newRule]
                 }
             });
@@ -904,7 +958,7 @@ router.get('/guild/:guildId/welcome', ensureAuthenticated, ensureBotInGuild, ens
     try {
         const guild = req.currentGuild;
         const welcomeConfig = await prisma.welcomeConfig.findUnique({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
         res.json({ success: true, welcomeConfig });
     } catch (error) {
@@ -940,7 +994,7 @@ router.post('/guild/:guildId/welcome', ensureAuthenticated, ensureBotInGuild, en
         } = req.body;
 
         await prisma.welcomeConfig.upsert({
-            where: { guildId: guild.id },
+            where: { guildId: req.dbGuild.id },
             update: {
                 enabled: enabled === 'true' || enabled === true,
                 channelId: channelId || null,
@@ -966,7 +1020,7 @@ router.post('/guild/:guildId/welcome', ensureAuthenticated, ensureBotInGuild, en
                 memberCountText: memberCountText || null,
             },
             create: {
-                guildId: guild.id,
+                guildId: req.dbGuild.id,
                 enabled: enabled === 'true' || enabled === true,
                 channelId: channelId || null,
                 message: message || null,
@@ -1012,7 +1066,7 @@ router.put('/guild/:guildId/rules/:ruleId', ensureAuthenticated, ensureBotInGuil
         const { title, description } = req.body;
 
         const rulesConfig = await prisma.rule.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         if (!rulesConfig) {
@@ -1051,7 +1105,7 @@ router.delete('/guild/:guildId/rules/:ruleId', ensureAuthenticated, ensureBotInG
         const { ruleId } = req.params;
 
         const rulesConfig = await prisma.rule.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         if (!rulesConfig) {
@@ -1080,7 +1134,7 @@ router.put('/guild/:guildId/rules/config', ensureAuthenticated, ensureBotInGuild
         const { channelId, webhookUrl } = req.body;
 
         const existing = await prisma.rule.findFirst({
-            where: { guildId: guild.id }
+            where: { guildId: req.dbGuild.id }
         });
 
         let rulesConfig;
@@ -1092,7 +1146,7 @@ router.put('/guild/:guildId/rules/config', ensureAuthenticated, ensureBotInGuild
         } else {
             rulesConfig = await prisma.rule.create({
                 data: {
-                    guildId: guild.id,
+                    guildId: req.dbGuild.id,
                     channelId,
                     webhookUrl,
                     rules: []
@@ -1390,7 +1444,7 @@ router.get('/guild/:guildId/social-alert', ensureAuthenticated, ensureGuildAdmin
         if (!guild) {
             return res.json({ success: true, alerts: [] });
         }
-        const alerts = await prisma.socialAlert.findMany({ where: { guildId: guild.id } });
+        const alerts = await prisma.socialAlert.findMany({ where: { guildId: req.dbGuild.id } });
         res.json({ success: true, alerts });
     } catch (error) {
         console.error('❌ Error getting social alerts:', error);
@@ -1439,7 +1493,7 @@ router.post('/guild/:guildId/social-alert', ensureAuthenticated, ensureGuildAdmi
 
         const alert = await prisma.socialAlert.create({
             data: {
-                guildId: guild.id,
+                guildId: req.dbGuild.id,
                 platform,
                 username: username || null,
                 channelUrl: channelUrl || null,

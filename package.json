@@ -7,8 +7,7 @@
           "test": "node .",
           "start": "node bot.js",
           "dev": "node bot.js",
-          "postinstall": "npx prisma generate",
-          "heroku-postbuild": "npx prisma db push && npx prisma generate"
+          "postinstall": "npx prisma generate"
      },
      "keywords": [
           "Discord",
@@ -19,13 +18,8 @@
      ],
      "author": "Kyonezet",
      "license": "ISC",
-     "engines": {
-          "node": "20.x",
-          "npm": ">=9.x"
-     },
      "dependencies": {
           "@discordjs/builders": "^1.13.1",
-          "@discordjs/opus": "^0.9.0",
           "@discordjs/voice": "^0.18.0",
           "@napi-rs/canvas": "^0.1.82",
           "@prisma/client": "^6.18.0",
@@ -33,7 +27,6 @@
           "bcrypt": "^6.0.0",
           "chalk": "^5.6.0",
           "compression": "^1.8.1",
-          "connect-mongo": "^5.1.0",
           "cpu-stat": "^2.0.1",
           "discord.js": "^14.21.0",
           "dotenv": "^17.2.1",
@@ -43,7 +36,6 @@
           "libsodium-wrappers": "^0.8.2",
           "moment": "^2.29.4",
           "moment-timezone": "^0.6.0",
-          "mongoose": "^8.7.0",
           "ms": "^2.1.3",
           "namaz": "^4.2.0",
           "node-fetch": "^3.3.2",

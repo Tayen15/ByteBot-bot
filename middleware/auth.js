@@ -10,7 +10,7 @@ function ensureAuthenticated(req, res, next) {
         };
         return next();
     }
-    if (req.isAuthenticated()) {
+    if (typeof req.isAuthenticated === 'function' && req.isAuthenticated()) {
         return next();
     }
     if (req.originalUrl.startsWith('/api')) {
@@ -43,7 +43,39 @@ async function ensureGuildAdmin(req, res, next) {
             const guildId = req.params.guildId || req.body.guildId;
             const client = req.app.get('discordClient') || req.discordClient;
             if (client && guildId) {
-                req.currentGuild = client.guilds.cache.get(guildId);
+                const guild = client.guilds.cache.get(guildId);
+                req.currentGuild = guild;
+                if (guild) {
+                    const prisma = require('../utils/database');
+                    let dbGuild = await prisma.guild.findUnique({ where: { guildId: guild.id } });
+                    if (!dbGuild) {
+                        dbGuild = await prisma.guild.create({
+                            data: {
+                                guildId: guild.id,
+                                name: guild.name,
+                                ownerId: guild.ownerId || '',
+                                icon: guild.icon || null
+                            }
+                        });
+                    }
+                    req.dbGuild = dbGuild;
+
+                    // Security: Verify permissions if requested by Next.js frontend for a specific user
+                    const discordId = req.headers['x-discord-id'];
+                    const isOwnerHeader = req.headers['x-is-owner'] === 'true';
+                    
+                    if (discordId && discordId !== OWNER_ID && !isOwnerHeader) {
+                        try {
+                            const member = await guild.members.fetch(discordId);
+                            if (!member || (!member.permissions.has('Administrator') && !member.permissions.has('ManageGuild'))) {
+                                return res.status(403).json({ success: false, error: 'Forbidden: Missing permissions in this guild' });
+                            }
+                            req.currentMember = member;
+                        } catch (e) {
+                            return res.status(403).json({ success: false, error: 'Forbidden: User not found in guild' });
+                        }
+                    }
+                }
             }
             return next();
         }
@@ -76,6 +108,19 @@ async function ensureGuildAdmin(req, res, next) {
 
         // Handle permissions
         if (member.id === OWNER_ID || member.permissions.has('Administrator') || member.permissions.has('ManageGuild')) {
+             const prisma = require('../utils/database');
+             let dbGuild = await prisma.guild.findUnique({ where: { guildId: guild.id } });
+             if (!dbGuild) {
+                 dbGuild = await prisma.guild.create({
+                     data: {
+                         guildId: guild.id,
+                         name: guild.name,
+                         ownerId: guild.ownerId || '',
+                         icon: guild.icon || null
+                     }
+                 });
+             }
+             req.dbGuild = dbGuild;
              req.currentGuild = guild;
              req.currentMember = member;
              return next();
