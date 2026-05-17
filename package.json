@@ -48,7 +48,7 @@
           "rss-parser": "^3.13.0",
           "sodium-native": "^5.1.0",
           "tweetnacl": "^1.0.3",
-          "undici": "^7.13.0"
+          "undici": "^7.24.0"
      },
      "devDependencies": {
           "cross-env": "^7.0.3"
