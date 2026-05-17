@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.8.0](https://github.com/Tayen15/ByteBot-bot/compare/v1.7.0...v1.8.0) (2026-05-17)
+
+
+### Features
+
+* add 24/7 lofi music streaming slash command and auto-reconnect handler ([c8cfcd0](https://github.com/Tayen15/ByteBot-bot/commit/c8cfcd0bca45ffdd9a6dcea3354b32c05b14ea49))
+
 ## [1.7.0](https://github.com/Tayen15/ByteBot-bot/compare/v1.6.4...v1.7.0) (2026-05-17)
 
 
