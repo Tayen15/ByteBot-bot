@@ -18,13 +18,11 @@ module.exports = async (client) => {
                const channel = await guild.channels.fetch(channelId);
                if (!channel || channel.type !== 2) continue;
 
-               const resource = createAudioResource(STREAM_URL, {
-                    inputType: StreamType.Arbitrary,
-                    inlineVolume: false
-               });
-
-               resource.playStream.on('error', (err) => {
-                    console.error('❌ [LofiReconnect] Stream error:' + err.message);
+               const connection = joinVoiceChannel({
+                    channelId: channel.id,
+                    guildId: guild.id,
+                    adapterCreator: guild.voiceAdapterCreator,
+                    selfDeaf: true
                });
 
                const player = createAudioPlayer({
@@ -37,16 +35,17 @@ module.exports = async (client) => {
                     console.error('❌ [LofiReconnect] Player error:' + err.message);
                });
 
-               player.play(resource);
+               const resource = createAudioResource(STREAM_URL, {
+                    inputType: StreamType.Arbitrary,
+                    inlineVolume: false
+               });
 
-               const connection = joinVoiceChannel({
-                    channelId: channel.id,
-                    guildId: guild.id,
-                    adapterCreator: guild.voiceAdapterCreator,
-                    selfDeaf: true
+               resource.playStream.on('error', (err) => {
+                    console.error('❌ [LofiReconnect] Stream error:' + err.message);
                });
 
                connection.subscribe(player);
+               player.play(resource);
 
                setInterval(async () => {
                     try {

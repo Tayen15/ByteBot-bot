@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@discordjs/opus': npm:@vvo/empty-npm-package@1.0.0
+  '@discordjs/opus': npm:opusscript@0.0.8
 
 importers:
 

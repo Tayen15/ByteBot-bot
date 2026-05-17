@@ -19,6 +19,19 @@ module.exports = {
           await interaction.deferReply();
 
           try {
+               const connection = joinVoiceChannel({
+                    channelId: channel.id,
+                    guildId: interaction.guild.id,
+                    adapterCreator: interaction.guild.voiceAdapterCreator,
+                    selfDeaf: true
+               });
+
+               connection.on('error', (err) => {
+                    console.error('❌ [Lofi] Connection error:', err.message);
+               });
+
+               await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
+
                const player = createAudioPlayer({
                     behaviors: {
                          noSubscriber: NoSubscriberBehavior.Play
@@ -38,26 +51,8 @@ module.exports = {
                     console.error('❌ [Lofi] Stream error:', err.message);
                });
 
-               player.play(resource);
-
-               const connection = joinVoiceChannel({
-                    channelId: channel.id,
-                    guildId: interaction.guild.id,
-                    adapterCreator: interaction.guild.voiceAdapterCreator,
-                    selfDeaf: true
-               });
-
-               connection.on('error', (err) => {
-                    console.error('❌ [Lofi] Connection error:', err.message);
-               });
-
                connection.subscribe(player);
-
-               try {
-                    await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
-               } catch (readyErr) {
-                    console.error('❌ [Lofi] Connection failed to become ready:', readyErr.message);
-               }
+               player.play(resource);
 
                saveLofiSession(interaction.guild.id, channel.id);
                
@@ -72,7 +67,7 @@ module.exports = {
 
           } catch (error) {
                console.error('❌ [Lofi] Error:', error);
-               await interaction.editReply({ content: '❌ Something went wrong while trying to play the lofi music!', flags: MessageFlags.Ephemeral });
+               await interaction.editReply({ content: '❌ Something went wrong while trying to play the lofi music!' }).catch(() => {});
           }
      }
 };

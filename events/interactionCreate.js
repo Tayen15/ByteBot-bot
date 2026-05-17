@@ -42,10 +42,14 @@ module.exports = {
 			console.error(`❌ Error executing "${interaction.commandName}"`);
 			console.error(error);
 
-			if (interaction.replied || interaction.deferred) {
-				await interaction.followUp({ content: '⚠️ An error occurred while executing the command!', flags: MessageFlags.Ephemeral });
-			} else {
-				await interaction.reply({ content: '⚠️ An error occurred while executing the command!', flags: MessageFlags.Ephemeral });
+			try {
+				if (interaction.replied || interaction.deferred) {
+					await interaction.followUp({ content: '⚠️ An error occurred while executing the command!', flags: MessageFlags.Ephemeral });
+				} else {
+					await interaction.reply({ content: '⚠️ An error occurred while executing the command!', flags: MessageFlags.Ephemeral });
+				}
+			} catch {
+				// Interaction expired or already handled by another instance
 			}
 		}
 	},
