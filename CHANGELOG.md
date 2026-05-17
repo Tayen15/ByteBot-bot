@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.7.0](https://github.com/Tayen15/ByteBot-bot/compare/v1.6.4...v1.7.0) (2026-05-17)
+
+
+### Features
+
+* initialize Prisma schema with MongoDB models for user, guild, and bot functionality ([7b7f30a](https://github.com/Tayen15/ByteBot-bot/commit/7b7f30af790bdce5872de3d58ea8e53998524637))
+
 ## [1.6.4](https://github.com/Tayen15/ByteBot-bot/compare/v1.6.3...v1.6.4) (2026-05-17)
 
 ## [1.6.3](https://github.com/Tayen15/ByteBot-bot/compare/v1.6.2...v1.6.3) (2026-05-17)
