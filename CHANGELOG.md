@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.6.3](https://github.com/Tayen15/ByteBot-bot/compare/v1.6.2...v1.6.3) (2026-05-17)
+
 ## [1.6.2](https://github.com/Tayen15/ByteBot-bot/compare/v1.6.1...v1.6.2) (2026-05-17)
 
 ## [1.6.1](https://github.com/Tayen15/ByteBot-bot/compare/v1.6.0...v1.6.1) (2026-05-17)
