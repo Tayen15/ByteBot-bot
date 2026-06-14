@@ -1,6 +1,13 @@
 const { createCanvas, loadImage, GlobalFonts } = require('@napi-rs/canvas');
 const path = require('path');
 
+try {
+  GlobalFonts.registerFromPath(path.join(__dirname, '../assets/fonts/gg-sans.ttf'), 'gg sans');
+  GlobalFonts.registerFromPath(path.join(__dirname, '../assets/fonts/gg-sans.ttf'), 'Discord');
+} catch (e) {
+  console.warn('⚠️ Failed to load custom font gg-sans.ttf:', e.message);
+}
+
 /**
  * Generate custom welcome image with user avatar and configurable design
  * @param {Object} options - Configuration options
@@ -45,27 +52,20 @@ async function generateWelcomeImage(options) {
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext('2d');
 
-  // Map font names to actual font families
-  let fontFamily = 'Arial, sans-serif';
-  if (font === 'gg sans' || font === 'Discord') {
-    fontFamily = 'Arial, sans-serif'; // Fallback since gg sans may not be available
-  } else if (font === 'Helvetica') {
-    fontFamily = 'Helvetica, Arial, sans-serif';
-  } else if (font === 'Impact') {
-    fontFamily = 'Impact, Arial Black, sans-serif';
-  } else if (font === 'Georgia') {
-    fontFamily = 'Georgia, serif';
-  } else if (font === 'Courier New') {
-    fontFamily = 'Courier New, monospace';
-  } else if (font === 'Comic Sans MS') {
-    fontFamily = 'Comic Sans MS, cursive';
-  } else if (font === 'Verdana') {
-    fontFamily = 'Verdana, sans-serif';
-  } else if (font === 'Times New Roman') {
-    fontFamily = 'Times New Roman, serif';
-  } else if (font === 'Arial') {
-    fontFamily = 'Arial, sans-serif';
-  }
+  const FONT_MAP = {
+    'gg sans': '"gg sans", Arial, sans-serif',
+    'Discord': '"Discord", Arial, sans-serif',
+    'Helvetica': 'Helvetica, Arial, sans-serif',
+    'Impact': 'Impact, Arial Black, sans-serif',
+    'Georgia': 'Georgia, serif',
+    'Courier New': 'Courier New, monospace',
+    'Comic Sans MS': 'Comic Sans MS, cursive',
+    'Verdana': 'Verdana, sans-serif',
+    'Times New Roman': 'Times New Roman, serif',
+    'Arial': 'Arial, sans-serif'
+  };
+
+  const fontFamily = FONT_MAP[font] || 'Arial, sans-serif';
 
   // Draw background
   if (bgImageUrl) {

@@ -191,6 +191,7 @@ model WelcomeConfig {
 
   // Message Templates (support placeholders: {{user}}, {{mention}}, {{server}}, {{memberCount}})
   message          String? // Plain message template
+  useEmbed         Boolean @default(false)
   embedTitle       String?
   embedDescription String?
   embedColor       String? // Hex string, e.g. #5865F2

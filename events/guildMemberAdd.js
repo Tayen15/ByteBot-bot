@@ -94,7 +94,7 @@ module.exports = {
         if (channel && channel.isTextBased()) {
           // Build message
           const content = render(cfg.message);
-          const embed = (cfg.embedTitle || cfg.embedDescription || cfg.imageUrl) ? {
+          const embed = (cfg.useEmbed && (cfg.embedTitle || cfg.embedDescription || cfg.imageUrl)) ? {
             title: render(cfg.embedTitle) || undefined,
             description: render(cfg.embedDescription) || undefined,
             color: cfg.embedColor ? parseInt(cfg.embedColor.replace('#', ''), 16) : undefined,

@@ -990,7 +990,7 @@ router.post('/guild/:guildId/welcome', ensureAuthenticated, ensureBotInGuild, en
 
         const {
             enabled, channelId, message, embedTitle, embedDescription, embedColor, imageUrl, dmEnabled, autoRoleId,
-            useCustomImage, layout, font, circleColor, titleColor, usernameColor, messageColor, overlayColor, bgImageUrl, bgColor, avatarShape, overlayOpacity, memberCountText
+            useEmbed, useCustomImage, layout, font, circleColor, titleColor, usernameColor, messageColor, overlayColor, bgImageUrl, bgColor, avatarShape, overlayOpacity, memberCountText
         } = req.body;
 
         await prisma.welcomeConfig.upsert({
@@ -999,13 +999,14 @@ router.post('/guild/:guildId/welcome', ensureAuthenticated, ensureBotInGuild, en
                 enabled: enabled === 'true' || enabled === true,
                 channelId: channelId || null,
                 message: message || null,
-                embedTitle: embedTitle || null,
-                embedDescription: embedDescription || null,
-                embedColor: embedColor || null,
-                imageUrl: imageUrl || null,
-                dmEnabled: dmEnabled === 'true' || dmEnabled === true,
-                autoRoleId: autoRoleId || null,
-                useCustomImage: useCustomImage === 'true' || useCustomImage === true,
+                embedTitle: req.body.hasOwnProperty('embedTitle') ? embedTitle : undefined,
+                embedDescription: req.body.hasOwnProperty('embedDescription') ? embedDescription : undefined,
+                embedColor: req.body.hasOwnProperty('embedColor') ? embedColor : undefined,
+                imageUrl: req.body.hasOwnProperty('imageUrl') ? imageUrl : undefined,
+                dmEnabled: req.body.hasOwnProperty('dmEnabled') ? (dmEnabled === 'true' || dmEnabled === true) : undefined,
+                autoRoleId: req.body.hasOwnProperty('autoRoleId') ? autoRoleId : undefined,
+                useEmbed: req.body.hasOwnProperty('useEmbed') ? (useEmbed === 'true' || useEmbed === true) : undefined,
+                useCustomImage: req.body.hasOwnProperty('useCustomImage') ? (useCustomImage === 'true' || useCustomImage === true) : undefined,
                 layout: layout || 'classic',
                 font: font || 'Discord',
                 circleColor: circleColor || null,
@@ -1030,6 +1031,7 @@ router.post('/guild/:guildId/welcome', ensureAuthenticated, ensureBotInGuild, en
                 imageUrl: imageUrl || null,
                 dmEnabled: dmEnabled === 'true' || dmEnabled === true,
                 autoRoleId: autoRoleId || null,
+                useEmbed: useEmbed === 'true' || useEmbed === true,
                 useCustomImage: useCustomImage === 'true' || useCustomImage === true,
                 layout: layout || 'classic',
                 font: font || 'Discord',

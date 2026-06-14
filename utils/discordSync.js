@@ -1,10 +1,16 @@
+const { PermissionsBitField } = require('discord.js');
+
 const syncUserGuilds = async (prisma, profile, userId) => {
     if (!profile.guilds || !Array.isArray(profile.guilds)) return;
 
     for (const guild of profile.guilds) {
         try {
             const isOwner = guild.owner === true;
-            const isAdmin = (guild.permissions & 0x8) === 0x8 || (guild.permissions & 0x20) === 0x20 || isOwner;
+            // Use PermissionsBitField instead of hardcoded hex values 0x8 (Administrator) and 0x20 (ManageGuild)
+            const permissions = BigInt(guild.permissions);
+            const isAdmin = (permissions & PermissionsBitField.Flags.Administrator) === PermissionsBitField.Flags.Administrator || 
+                            (permissions & PermissionsBitField.Flags.ManageGuild) === PermissionsBitField.Flags.ManageGuild || 
+                            isOwner;
 
             let dbGuild = await prisma.guild.findUnique({ where: { guildId: guild.id } });
             if (!dbGuild) {
