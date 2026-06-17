@@ -128,12 +128,12 @@ async function drawSimpleLayout(ctx, options) {
         ctx.restore();
 
         ctx.strokeStyle = circleColor;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(centerX, avatarY, avatarSize / 2, 0, Math.PI * 2);
         ctx.stroke();
       } else {
-        const radius = 15;
+        const radius = 0;
         ctx.beginPath();
         roundRect(ctx, centerX - avatarSize / 2, avatarY - avatarSize / 2, avatarSize, avatarSize, radius);
         ctx.closePath();
@@ -142,7 +142,7 @@ async function drawSimpleLayout(ctx, options) {
         ctx.restore();
 
         ctx.strokeStyle = circleColor;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         roundRect(ctx, centerX - avatarSize / 2, avatarY - avatarSize / 2, avatarSize, avatarSize, radius);
         ctx.stroke();
@@ -196,12 +196,12 @@ async function drawLeftLayout(ctx, options) {
         ctx.restore();
 
         ctx.strokeStyle = circleColor;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(avatarX, avatarY, avatarSize / 2, 0, Math.PI * 2);
         ctx.stroke();
       } else {
-        const radius = 15;
+        const radius = 0;
         ctx.beginPath();
         roundRect(ctx, avatarX - avatarSize / 2, avatarY - avatarSize / 2, avatarSize, avatarSize, radius);
         ctx.closePath();
@@ -210,7 +210,7 @@ async function drawLeftLayout(ctx, options) {
         ctx.restore();
 
         ctx.strokeStyle = circleColor;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         roundRect(ctx, avatarX - avatarSize / 2, avatarY - avatarSize / 2, avatarSize, avatarSize, radius);
         ctx.stroke();
@@ -263,12 +263,12 @@ async function drawRightLayout(ctx, options) {
         ctx.restore();
 
         ctx.strokeStyle = circleColor;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(avatarX, avatarY, avatarSize / 2, 0, Math.PI * 2);
         ctx.stroke();
       } else {
-        const radius = 15;
+        const radius = 0;
         ctx.beginPath();
         roundRect(ctx, avatarX - avatarSize / 2, avatarY - avatarSize / 2, avatarSize, avatarSize, radius);
         ctx.closePath();
@@ -277,7 +277,7 @@ async function drawRightLayout(ctx, options) {
         ctx.restore();
 
         ctx.strokeStyle = circleColor;
-        ctx.lineWidth = 5;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         roundRect(ctx, avatarX - avatarSize / 2, avatarY - avatarSize / 2, avatarSize, avatarSize, radius);
         ctx.stroke();
@@ -337,7 +337,7 @@ function drawPlaceholderAvatar(ctx, x, y, size, color, shape) {
     ctx.fill();
 
     ctx.strokeStyle = color;
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 5;
     ctx.stroke();
 
     // Draw user icon
@@ -347,14 +347,14 @@ function drawPlaceholderAvatar(ctx, x, y, size, color, shape) {
     ctx.textBaseline = 'middle';
     ctx.fillText('👤', x, y);
   } else {
-    const radius = 20;
+    const radius = 0;
     ctx.fillStyle = '#36393F';
     ctx.beginPath();
     roundRect(ctx, x - size / 2, y - size / 2, size, size, radius);
     ctx.fill();
 
     ctx.strokeStyle = color;
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 5;
     ctx.stroke();
 
     ctx.fillStyle = color;
