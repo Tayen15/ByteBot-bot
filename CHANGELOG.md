@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.8.1](https://github.com/Tayen15/ByteBot-bot/compare/v1.8.0...v1.8.1) (2026-06-17)
+
+
+### Bug Fixes
+
+* implement Prisma database schema and core bot infrastructure including welcome image generation, Discord synchronization, and JSON storage utilities. ([576838a](https://github.com/Tayen15/ByteBot-bot/commit/576838aa2fb8a2c4d915cccf0bfc91a4848ae115))
+* implement welcome image generator with multi-layout support using @napi-rs/canvas ([9255331](https://github.com/Tayen15/ByteBot-bot/commit/92553314350ce08435886e82e67526f02c8ffe57))
+
 ## [1.8.0](https://github.com/Tayen15/ByteBot-bot/compare/v1.7.0...v1.8.0) (2026-05-17)
 
 
