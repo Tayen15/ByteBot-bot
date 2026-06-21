@@ -3,14 +3,6 @@ const { Manager } = require("magmastream");
 // Public Lavalink Nodes (Free)
 const nodes = [
   {
-    host: "192.168.123.6",
-    port: 2333,
-    password: "jejecantik",
-    useSSL: false,
-    maxRetryAttempts: 10,
-    retryDelayMs: 5000,
-  },
-  {
     host: "https://lavalink-host.oktaa.my.id",
     port: 443,
     password: "jejecantik",
