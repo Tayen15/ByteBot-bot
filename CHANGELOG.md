@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.9.0](https://github.com/Tayen15/ByteBot-bot/compare/v1.8.1...v1.9.0) (2026-06-21)
+
+
+### Features
+
+* implement persistent lofi streaming and automatic reconnection using Magmastream ([c71b294](https://github.com/Tayen15/ByteBot-bot/commit/c71b29448bdc6e16f3f4aba4acfbb8263450c410))
+* initialize Lavalink music manager with Magmastream configuration and event handlers ([bd0939d](https://github.com/Tayen15/ByteBot-bot/commit/bd0939d727f33eb7552fe8f46fd6708509d570cd))
+
 ## [1.8.1](https://github.com/Tayen15/ByteBot-bot/compare/v1.8.0...v1.8.1) (2026-06-17)
 
 
