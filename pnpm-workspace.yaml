@@ -4,3 +4,4 @@ allowBuilds:
   bcrypt: true
   ffmpeg-static: true
   prisma: true
+  youtube-dl-exec: set this to true or false

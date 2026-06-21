@@ -1,5 +1,10 @@
 require('dotenv').config();
 require('./utils/logger.js');
+const dns = require('dns');
+
+// Fix Discord Voice connection issue (Connecting -> Signalling loop) on Node.js 18+
+// This forces Node.js to use IPv4 instead of IPv6 for UDP connections.
+dns.setDefaultResultOrder('ipv4first');
 
 // Start Discord bot
 const client = require('./index.js');

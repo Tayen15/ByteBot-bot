@@ -55,9 +55,14 @@ client.commands = new Collection();
     require(`./handlers/${handler}`)(client);
 });
 
+// Load Lavalink handler
+require('./handlers/lavalink.js')(client);
+
 // Initialize background handlers - registered ONCE, after bot is ready
 // NOTE: prayerTime and lofiReconnect are handled inside events/ready.js
 client.once('ready', () => {
+    client.manager.init({ clientId: client.user.id });
+    
     // Social alerts (named export)
     try {
         const { setupSocialAlerts } = require('./handlers/socialAlert');
@@ -76,6 +81,9 @@ client.once('ready', () => {
 });
 
 client.login(process.env.DISCORD_TOKEN).catch(() => console.log('❌ Invalid TOKEN!'));
+
+// Forward raw events to Lavalink Manager
+client.on('raw', (d) => client.manager.updateVoiceState(d));
 
 // Export client for use in web server
 module.exports = client;

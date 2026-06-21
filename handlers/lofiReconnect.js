@@ -1,72 +1,53 @@
 const { getLofiSessions } = require('../utils/lofiStorage');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, NoSubscriberBehavior, StreamType } = require('@discordjs/voice');
 
-const STREAM_URL = 'http://stream.zeno.fm/0r0xa792kwzuv';
-const RECONNECT_INTERVAL = 30000; // 30 detik
+const STREAM_URL = 'https://www.youtube.com/watch?v=qGohtGC5Rtk';
 
 module.exports = async (client) => {
-     const sessions = await getLofiSessions();
+     const reconnectLogic = async () => {
+          const sessions = await getLofiSessions();
 
-     if (!sessions || sessions.length === 0) {
-          console.log('[LofiReconnect] No active lofi sessions to reconnect');
-          return;
-     }
-
-     for (const { guildId, channelId } of sessions) {
-          try {
-               const guild = await client.guilds.fetch(guildId);
-               const channel = await guild.channels.fetch(channelId);
-               if (!channel || channel.type !== 2) continue;
-
-               const connection = joinVoiceChannel({
-                    channelId: channel.id,
-                    guildId: guild.id,
-                    adapterCreator: guild.voiceAdapterCreator,
-                    selfDeaf: true
-               });
-
-               const player = createAudioPlayer({
-                    behaviors: {
-                         noSubscriber: NoSubscriberBehavior.Play,
-                    }
-               });
-
-               player.on('error', (err) => {
-                    console.error('❌ [LofiReconnect] Player error:' + err.message);
-               });
-
-               const resource = createAudioResource(STREAM_URL, {
-                    inputType: StreamType.Arbitrary,
-                    inlineVolume: false
-               });
-
-               resource.playStream.on('error', (err) => {
-                    console.error('❌ [LofiReconnect] Stream error:' + err.message);
-               });
-
-               connection.subscribe(player);
-               player.play(resource);
-
-               setInterval(async () => {
-                    try {
-                         const status = player.state.status;
-                         const res = await fetch(STREAM_URL, { method: 'HEAD' });
-                         
-                         if (status !== AudioPlayerStatus.Playing || !res.ok) {
-                              const newResource = createAudioResource(STREAM_URL, {
-                                   inputType: StreamType.Arbitrary,
-                                   inlineVolume: false
-                              });
-                              player.play(newResource);
-                         }
-                    } catch (err) {
-                         console.error('[LofiReconnect] Auto-reconnect check failed:', err.message);
-                    }
-               }, RECONNECT_INTERVAL);
-
-               console.log('[LofiReconnect] Reconnected to ' + guild.name + ' - #' + channel.name);
-          } catch (err) {
-               console.error('[LofiReconnect] Error on ' + guildId + ':', err.message);
+          if (!sessions || sessions.length === 0) {
+               console.log('[LofiReconnect] No active lofi sessions to reconnect');
+               return;
           }
+
+          for (const { guildId, channelId } of sessions) {
+               try {
+                    const guild = await client.guilds.fetch(guildId);
+                    const channel = await guild.channels.fetch(channelId);
+                    if (!channel || channel.type !== 2) continue;
+
+                    // Reconnect via Lavalink
+                    const player = client.manager.create({
+                         guildId: guild.id,
+                         voiceChannelId: channel.id,
+                         textChannelId: channel.id, // Fallback text channel
+                         volume: 100
+                    });
+
+                    if (player.state !== 'CONNECTED') player.connect();
+
+                    const res = await client.manager.search(STREAM_URL, client.user);
+                    if (res.loadType === 'error' || res.loadType === 'empty') continue;
+
+                    player.queue.add(res.tracks[0]);
+
+                    if (!player.playing && !player.paused) {
+                         player.play();
+                    }
+
+                    console.log('[LofiReconnect] Reconnected to ' + guild.name + ' - #' + channel.name);
+               } catch (err) {
+                    console.error('[LofiReconnect] Error on ' + guildId + ':', err.message);
+               }
+          }
+     };
+
+     // Wait for Lavalink manager to be ready
+     const isConnected = [...client.manager.nodes.values()].some(node => node.connected);
+     if (isConnected) {
+          reconnectLogic();
+     } else {
+          client.manager.once('nodeConnect', reconnectLogic);
      }
 };

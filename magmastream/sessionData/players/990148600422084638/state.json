@@ -1,0 +1,247 @@
+{
+  "clusterId": 0,
+  "data": {
+    "nowPlayingMessage": null
+  },
+  "dynamicRepeat": false,
+  "filters": {
+    "bassBoostlevel": 0,
+    "distortion": null,
+    "equalizer": [],
+    "filterStatus": {
+      "bassboost": false,
+      "china": false,
+      "chipmunk": false,
+      "darthvader": false,
+      "daycore": false,
+      "demon": false,
+      "distort": false,
+      "doubletime": false,
+      "earrape": false,
+      "eightD": false,
+      "electronic": false,
+      "nightcore": false,
+      "party": false,
+      "pop": false,
+      "radio": false,
+      "setDistortion": false,
+      "setKaraoke": false,
+      "setRotation": false,
+      "setTimescale": false,
+      "slowmo": false,
+      "soft": false,
+      "trebleBass": false,
+      "tremolo": false,
+      "tv": false,
+      "vaporwave": false,
+      "vibrato": false
+    },
+    "karaoke": null,
+    "reverb": null,
+    "rotation": null,
+    "timescale": null,
+    "vibrato": null,
+    "volume": 1
+  },
+  "guildId": "990148600422084638",
+  "node": {
+    "info": {
+      "buildTime": 1772839456827,
+      "filters": [
+        "volume",
+        "equalizer",
+        "karaoke",
+        "timescale",
+        "tremolo",
+        "vibrato",
+        "distortion",
+        "rotation",
+        "channelMix",
+        "lowPass"
+      ],
+      "git": {
+        "branch": "HEAD",
+        "commit": "e8503fd",
+        "commitTime": 1772839275000
+      },
+      "jvm": "18.0.2.1",
+      "lavaplayer": "2.2.6",
+      "plugins": [
+        {
+          "name": "youtube-plugin",
+          "version": "1.18.1"
+        }
+      ],
+      "sourceManagers": [
+        "soundcloud",
+        "bandcamp",
+        "twitch",
+        "vimeo",
+        "youtube",
+        "http"
+      ],
+      "version": {
+        "major": 4,
+        "minor": 2,
+        "patch": 2,
+        "preRelease": "",
+        "semver": "4.2.2"
+      }
+    },
+    "isNodeLink": false,
+    "options": {
+      "apiRequestTimeoutMs": 10000,
+      "enableSessionResumeOption": false,
+      "host": "192.168.123.6",
+      "identifier": "192.168.123.6",
+      "isBackup": false,
+      "isNodeLink": false,
+      "maxRetryAttempts": 10,
+      "nodePriority": 0,
+      "password": "jejecantik",
+      "port": 2333,
+      "retryDelayMs": 5000,
+      "sessionTimeoutSeconds": 60,
+      "useSSL": false
+    },
+    "reconnectAttempts": 1,
+    "sessionId": "nmshzi7mji06veru",
+    "socket": {
+      "_autoPong": true,
+      "_binaryType": "nodebuffer",
+      "_bufferedAmount": 0,
+      "_closeCode": 1006,
+      "_closeFrameReceived": false,
+      "_closeFrameSent": false,
+      "_closeMessage": {
+        "data": [],
+        "type": "Buffer"
+      },
+      "_closeTimeout": 30000,
+      "_closeTimer": null,
+      "_errorEmitted": false,
+      "_events": {},
+      "_eventsCount": 5,
+      "_extensions": {},
+      "_isServer": false,
+      "_paused": false,
+      "_protocol": "",
+      "_readyState": 1,
+      "_receiver": {
+        "_allowSynchronousEvents": true,
+        "_binaryType": "nodebuffer",
+        "_bufferedBytes": 0,
+        "_buffers": [],
+        "_compressed": false,
+        "_errored": false,
+        "_events": {},
+        "_eventsCount": 6,
+        "_extensions": {},
+        "_fin": true,
+        "_fragmented": 0,
+        "_fragments": [],
+        "_isServer": false,
+        "_loop": false,
+        "_masked": false,
+        "_maxPayload": 104857600,
+        "_messageLength": 0,
+        "_opcode": 1,
+        "_payloadLength": 132,
+        "_skipUTF8Validation": false,
+        "_state": 0,
+        "_totalPayloadLength": 0,
+        "_writableState": {
+          "bufferedIndex": 0,
+          "corked": 0,
+          "highWaterMark": 16384,
+          "length": 0,
+          "pendingcb": 0,
+          "writelen": 0
+        }
+      },
+      "_redirects": 0,
+      "_req": null,
+      "_sender": {
+        "_bufferedBytes": 0,
+        "_compress": false,
+        "_extensions": {},
+        "_firstFragment": true,
+        "_queue": [],
+        "_state": 0
+      },
+      "_url": "ws://192.168.123.6:2333/v4/websocket"
+    },
+    "stats": {
+      "cpu": {
+        "cores": 1,
+        "lavalinkLoad": 0.12445851382872376,
+        "systemLoad": 0.3272014988928632
+      },
+      "frameStats": {
+        "deficit": 175,
+        "nulled": 0,
+        "sent": 2825
+      },
+      "memory": {
+        "allocated": 63803392,
+        "free": 17864024,
+        "reservable": 429785088,
+        "used": 45939368
+      },
+      "playingPlayers": 1,
+      "uptime": 3278694
+    }
+  },
+  "options": {
+    "applyVolumeAsFilter": false,
+    "guildId": "990148600422084638",
+    "pauseOnDisconnect": true,
+    "selfDeafen": false,
+    "selfMute": false,
+    "textChannelId": "990148601101570090",
+    "voiceChannelId": "990148601101570091",
+    "volume": 100
+  },
+  "paused": false,
+  "playing": true,
+  "position": 2025315000,
+  "queue": {
+    "current": {
+      "artworkUrl": null,
+      "author": "Lofi Girl",
+      "customData": {},
+      "duration": 9223372036854776000,
+      "identifier": "qGohtGC5Rtk",
+      "isAutoplay": false,
+      "isSeekable": true,
+      "isStream": true,
+      "isrc": null,
+      "pluginInfo": {},
+      "requester": {
+        "id": "746598982049988619",
+        "username": "kyonezet"
+      },
+      "sourceName": "YouTube",
+      "thumbnail": "https://img.youtube.com/vi/qGohtGC5Rtk/default.jpg",
+      "title": "Study With Me 📚 Pomodoro",
+      "track": "QAAAggMAHVN0dWR5IFdpdGggTWUg7aC97bOaIFBvbW9kb3JvAAlMb2ZpIEdpcmx//////////wALcUdvaHRHQzVSdGsBAQAraHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1xR29odEdDNVJ0awAAAAd5b3V0dWJlAAAAAAAAAAA=",
+      "uri": "https://www.youtube.com/watch?v=qGohtGC5Rtk"
+    },
+    "previous": [],
+    "tracks": []
+  },
+  "queueRepeat": false,
+  "textChannelId": "990148601101570090",
+  "trackRepeat": false,
+  "voiceChannelId": "990148601101570091",
+  "voiceState": {
+    "channelId": "990148601101570091",
+    "event": {
+      "endpoint": "c-sin13-7f41f4b3.discord.media:2087",
+      "guild_id": "990148600422084638",
+      "token": "7c8e7a376c0c4715"
+    },
+    "sessionId": "a2141cd48f2e3a1b3e3882951e7cf0a6"
+  },
+  "volume": 100
+}

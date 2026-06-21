@@ -1,73 +1,83 @@
-const { SlashCommandBuilder, MessageFlags, EmbedBuilder } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, VoiceConnectionStatus, entersState, StreamType } = require('@discordjs/voice');
-const { saveLofiSession } = require('../../utils/lofiStorage');
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  MessageFlags,
+} = require("discord.js");
+const { saveLofiSession } = require("../../utils/lofiStorage.js");
 
-const STREAM_URL = 'http://stream.zeno.fm/0r0xa792kwzuv';
+// Standard Lofi Stream URL (Lofi Girl)
+const STREAM_URL = "https://www.youtube.com/watch?v=qGohtGC5Rtk";
 
 module.exports = {
-     data: new SlashCommandBuilder()
-          .setName('lofi')
-          .setDescription('Play lofi music from a 24/7 stream'),
-     name: 'lofi',
-     category: 'music',
-     async execute(interaction) {
-          const channel = interaction.member.voice.channel;
-          if (!channel) {
-               return interaction.reply({ content: '❌ Please join a voice channel first!', flags: MessageFlags.Ephemeral });
-          }
+  data: new SlashCommandBuilder()
+    .setName("lofi")
+    .setDescription("Plays 24/7 lofi music in your voice channel."),
+  category: "music",
+  async execute(interaction) {
+    const channel = interaction.member.voice.channel;
+    if (!channel) {
+      return interaction.reply({
+        content: "❌ Please join a voice channel first!",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
 
-          await interaction.deferReply();
+    await interaction.deferReply();
 
-          try {
-               const connection = joinVoiceChannel({
-                    channelId: channel.id,
-                    guildId: interaction.guild.id,
-                    adapterCreator: interaction.guild.voiceAdapterCreator,
-                    selfDeaf: true
-               });
+    try {
+      // Get Lavalink manager
+      const manager = interaction.client.manager;
 
-               connection.on('error', (err) => {
-                    console.error('❌ [Lofi] Connection error:', err.message);
-               });
+      // Create or get Lavalink player
+      const player = manager.create({
+        guildId: interaction.guild.id,
+        voiceChannelId: channel.id,
+        textChannelId: interaction.channel.id,
+        volume: 100,
+      });
 
-               await entersState(connection, VoiceConnectionStatus.Ready, 30_000);
+      // Connect to voice channel
+      if (player.state !== "CONNECTED") player.connect();
 
-               const player = createAudioPlayer({
-                    behaviors: {
-                         noSubscriber: NoSubscriberBehavior.Play
-                    }
-               });
+      // Search for the track using Magmastream
+      const res = await manager.search(STREAM_URL, interaction.user);
 
-               player.on('error', (err) => {
-                    console.error('❌ [Lofi] Player error:', err.message);
-               });
+      if (res.loadType === "error" || res.loadType === "empty") {
+        if (!player.queue.current) player.destroy();
+        return interaction.editReply({
+          content:
+            "❌ Could not find the lofi stream or Lavalink node is unavailable.",
+        });
+      }
 
-               const resource = createAudioResource(STREAM_URL, {
-                    inputType: StreamType.Arbitrary,
-                    inlineVolume: false
-               });
+      // Add track and play
+      const track = res.tracks[0];
+      player.queue.add(track);
 
-               resource.playStream.on('error', (err) => {
-                    console.error('❌ [Lofi] Stream error:', err.message);
-               });
+      if (!player.playing && !player.paused) {
+        player.play();
+      }
 
-               connection.subscribe(player);
-               player.play(resource);
+      saveLofiSession(interaction.guild.id, channel.id);
 
-               saveLofiSession(interaction.guild.id, channel.id);
-               
-               const embed = new EmbedBuilder()
-                    .setColor('#1DB954')
-                    .setTitle('🎧 Lofi Music')
-                    .setDescription('Now playing **lofi** 24/7 radio in <#' + channel.id + '>')
-                    .setFooter({ text: 'Enjoy the vibes!' })
-                    .setTimestamp();
+      const embed = new EmbedBuilder()
+        .setColor("#1DB954")
+        .setTitle("🎧 Lofi Music")
+        .setDescription(
+          "Now playing **lofi** 24/7 radio in <#" + channel.id + ">",
+        )
+        .setFooter({ text: "Powered by Lavalink" })
+        .setTimestamp();
 
-               await interaction.editReply({ embeds: [embed] });
-
-          } catch (error) {
-               console.error('❌ [Lofi] Error:', error);
-               await interaction.editReply({ content: '❌ Something went wrong while trying to play the lofi music!' }).catch(() => {});
-          }
-     }
+      await interaction.editReply({ embeds: [embed] });
+    } catch (error) {
+      console.error("❌ [Lofi] Error:", error);
+      await interaction
+        .editReply({
+          content:
+            "❌ Something went wrong while trying to play the lofi music!",
+        })
+        .catch(() => {});
+    }
+  },
 };
