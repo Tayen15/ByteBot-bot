@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.10.0](https://github.com/Tayen15/ByteBot-bot/compare/v1.9.0...v1.10.0) (2026-07-25)
+
+
+### Features
+
+* add AI-powered slash commands for channel summarization and music analysis along with a new backend API for guild management. ([67f64a9](https://github.com/Tayen15/ByteBot-bot/commit/67f64a988eda9c0480c2d6e0c3605c0c8d6abff3))
+
+
+### Bug Fixes
+
+* url host for lavalink host ([b4f884b](https://github.com/Tayen15/ByteBot-bot/commit/b4f884b8d8d8f56466a02e71b3117d3a0d2ab9ef))
+
 ## [1.9.0](https://github.com/Tayen15/ByteBot-bot/compare/v1.8.1...v1.9.0) (2026-06-21)
 
 
