@@ -41,6 +41,7 @@ model Guild {
   serverMonitoring ServerMonitoring[]
   WelcomeConfig    WelcomeConfig?
   socialAlerts     SocialAlert[]
+  aiSettings       AiSettings?
 }
 
 // Guild Member - relationship between users and guilds
@@ -343,4 +344,30 @@ model FeatureToggle {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// AI Configuration per Guild
+model AiSettings {
+  id      String @id @default(uuid()) @map("_id")
+  guildId String @unique
+
+  // 1. Chatbot
+  chatbotEnabled Boolean @default(false)
+  chatChannelId  String?
+  persona        String  @default("Kamu adalah Bytebot, asisten Discord yang cerdas, ramah, dan sedikit lucu.")
+  temperature    Float   @default(0.7)
+  contextLimit   Int     @default(10)
+  responseStyle  String  @default("casual") // casual, professional, genz, anime
+  
+  // 2. Smart Moderation
+  smartModEnabled Boolean @default(false)
+  modLogChannelId String?
+
+  // 3. TLDR Feature
+  tldrEnabled Boolean @default(true)
+
+  // 4. Quote / Motivation Command (previously Daily Content)
+  quoteEnabled   Boolean @default(true)
+
+  guild Guild @relation(fields: [guildId], references: [id])
 }

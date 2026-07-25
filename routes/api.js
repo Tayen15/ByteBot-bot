@@ -458,14 +458,16 @@ router.get('/guild/:guildId/features', ensureAuthenticated, ensureBotInGuild, en
             welcome,
             rules,
             alertsCount,
-            monitorsCount
+            monitorsCount,
+            aiSettings
         ] = await Promise.all([
             prisma.featureToggle.findMany(),
             prisma.prayerTime.findFirst({ where: { guildId: req.dbGuild.id } }),
             prisma.welcomeConfig.findUnique({ where: { guildId: req.dbGuild.id } }),
             prisma.rule.findFirst({ where: { guildId: req.dbGuild.id } }),
             prisma.socialAlert.count({ where: { guildId: req.dbGuild.id } }),
-            prisma.serverMonitoring.count({ where: { guildId: req.dbGuild.id } })
+            prisma.serverMonitoring.count({ where: { guildId: req.dbGuild.id } }),
+            prisma.aiSettings.findUnique({ where: { guildId: req.dbGuild.id } })
         ]);
 
         // Map global toggles
@@ -482,6 +484,7 @@ router.get('/guild/:guildId/features', ensureAuthenticated, ensureBotInGuild, en
             rules_management: globalConfig.rules_management !== false,
             social_alerts: globalConfig.social_alerts !== false,
             server_monitoring: globalConfig.server_monitoring !== false,
+            ai_features: globalConfig.ai_features !== false,
             
             // Guild-specific active states — true if feature has been configured for this guild
             active_states: {
@@ -489,7 +492,8 @@ router.get('/guild/:guildId/features', ensureAuthenticated, ensureBotInGuild, en
                  welcome_message: !!welcome,    // has welcome config
                  rules_management: !!rules,     // has at least one rule
                  social_alerts: alertsCount > 0,
-                 server_monitoring: monitorsCount > 0
+                 server_monitoring: monitorsCount > 0,
+                 ai_features: !!aiSettings && (aiSettings.chatbotEnabled || aiSettings.smartModEnabled || aiSettings.tldrEnabled || aiSettings.quoteEnabled)
             }
         };
 
@@ -657,6 +661,71 @@ router.post('/guild/:guildId/prayer', ensureAuthenticated, ensureBotInGuild, ens
             return res.redirect(`/dashboard/guild/${req.params.guildId}/prayer?error=update_failed`);
         }
 
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// ===== AI Settings API =====
+
+// Get AI settings
+router.get('/guild/:guildId/ai', ensureAuthenticated, ensureBotInGuild, ensureGuildAdmin, async (req, res) => {
+    try {
+        const guild = req.currentGuild;
+        let aiSettings = await prisma.aiSettings.findUnique({
+            where: { guildId: req.dbGuild.id }
+        });
+
+        if (!aiSettings) {
+            aiSettings = await prisma.aiSettings.create({
+                data: { guildId: req.dbGuild.id }
+            });
+        }
+
+        res.json({ success: true, aiSettings });
+    } catch (error) {
+        console.error('[API] Error getting AI settings:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Update AI settings
+router.post('/guild/:guildId/ai', ensureAuthenticated, ensureBotInGuild, ensureGuildAdmin, async (req, res) => {
+    try {
+        const guild = req.currentGuild;
+        const updates = req.body;
+
+        const data = {
+            chatbotEnabled: updates.chatbotEnabled === 'true' || updates.chatbotEnabled === true,
+            chatChannelId: updates.chatChannelId || null,
+            persona: updates.persona || "Kamu adalah Bytebot, asisten Discord yang cerdas, ramah, dan sedikit lucu.",
+            temperature: parseFloat(updates.temperature) || 0.7,
+            contextLimit: parseInt(updates.contextLimit) || 10,
+            responseStyle: updates.responseStyle || "casual",
+            smartModEnabled: updates.smartModEnabled === 'true' || updates.smartModEnabled === true,
+            modLogChannelId: updates.modLogChannelId || null,
+            tldrEnabled: updates.tldrEnabled === 'true' || updates.tldrEnabled === true,
+            quoteEnabled: updates.quoteEnabled === 'true' || updates.quoteEnabled === true,
+        };
+
+        const aiSettings = await prisma.aiSettings.upsert({
+            where: { guildId: req.dbGuild.id },
+            update: data,
+            create: {
+                guildId: req.dbGuild.id,
+                ...data
+            }
+        });
+
+        if (req.headers.accept && req.headers.accept.includes('text/html')) {
+            return res.redirect(`/dashboard/guild/${guild.guildId}/ai`);
+        }
+
+        res.json({ success: true, aiSettings });
+    } catch (error) {
+        console.error('[API] Error updating AI settings:', error);
+        if (req.headers.accept && req.headers.accept.includes('text/html')) {
+            return res.redirect(`/dashboard/guild/${req.params.guildId}/ai?error=update_failed`);
+        }
         res.status(500).json({ success: false, error: error.message });
     }
 });

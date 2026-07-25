@@ -9,7 +9,7 @@ const UPDATE_INTERVAL = 60 * 1000;
 const activePrayerSchedules = new Map();
 
 // Mengambil data jadwal salat dari API
-async function fetchPrayerTimes(city, country) {
+async function fetchPrayerTimes(city, country, timezone) {
      try {
           const PRAYER_API_URL = "https://api.aladhan.com/v1/timingsByCity";
           const response = await fetch(`${PRAYER_API_URL}?city=${city}&country=${country}&method=20`);
@@ -17,9 +17,13 @@ async function fetchPrayerTimes(city, country) {
 
           if (!data?.data?.timings) throw new Error("Failed to retrieve prayer schedule data");
 
+          const now = moment().tz(timezone || "Asia/Jakarta");
+          const isFriday = now.day() === 5;
+          const dhuhrLabel = isFriday ? "Jumu'ah" : "Dhuhr";
+
           return {
                Fajr: convertTo24HourFormat(data.data.timings.Fajr),
-               Dhuhr: convertTo24HourFormat(data.data.timings.Dhuhr),
+               [dhuhrLabel]: convertTo24HourFormat(data.data.timings.Dhuhr),
                Asr: convertTo24HourFormat(data.data.timings.Asr),
                Maghrib: convertTo24HourFormat(data.data.timings.Maghrib),
                Isha: convertTo24HourFormat(data.data.timings.Isha)
@@ -103,11 +107,12 @@ async function updatePrayerMessage(client, guildId) {
                return;
           }
 
+          const timezone = prayerConfig.guild?.settings?.timezone || process.env.DEFAULT_TIMEZONE || "Asia/Jakarta";
+
           // Fetch prayer times from API
-          const prayerTimes = await fetchPrayerTimes(prayerConfig.city, prayerConfig.country);
+          const prayerTimes = await fetchPrayerTimes(prayerConfig.city, prayerConfig.country, timezone);
           if (Object.keys(prayerTimes).length === 0) return;
 
-          const timezone = prayerConfig.guild?.settings?.timezone || process.env.DEFAULT_TIMEZONE || "Asia/Jakarta";
           const embed = formatPrayerTimesEmbed(client, prayerTimes, prayerConfig.city, prayerConfig.customMessage, timezone);
           
           // Try to update existing message or create new one
