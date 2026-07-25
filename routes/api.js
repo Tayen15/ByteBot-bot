@@ -23,6 +23,32 @@ router.get('/health', (req, res) => {
     });
 });
 
+router.get('/public/commands', (req, res) => {
+    try {
+        const client = req.discordClient;
+        if (!client) {
+            return res.status(503).json({ success: false, error: 'Bot is not connected' });
+        }
+
+        // Get all commands from client
+        const commands = Array.from(client.commands.values()).map(cmd => {
+            const isOwnerOnly = !!cmd.ownerOnly || cmd.category === 'dev';
+            return {
+                name: cmd.name || (cmd.data && cmd.data.name),
+                category: cmd.category || 'other',
+                description: (cmd.data && cmd.data.description) || cmd.description || 'No description',
+                adminOnly: !!cmd.adminOnly,
+                ownerOnly: isOwnerOnly
+            };
+        }).filter(cmd => !cmd.ownerOnly);
+
+        res.json({ success: true, commands });
+    } catch (error) {
+        console.error('[API] Error getting public commands:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // ===== Owner API =====
 
 // Send announcement to all guilds or specific guild
