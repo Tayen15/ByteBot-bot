@@ -105,7 +105,7 @@
       "useSSL": true
     },
     "reconnectAttempts": 1,
-    "sessionId": "16u28dqh5syau4wp",
+    "sessionId": "5ymd2lxq6htc8uvy",
     "socket": {
       "_autoPong": true,
       "_binaryType": "nodebuffer",
@@ -174,28 +174,27 @@
     "stats": {
       "cpu": {
         "cores": 1,
-        "lavalinkLoad": 0.12812182402825678,
-        "systemLoad": 0.3812913065582105
+        "lavalinkLoad": 0.13466666666666666,
+        "systemLoad": 0.3651656754460493
       },
       "frameStats": {
-        "deficit": 188,
+        "deficit": 178,
         "nulled": 0,
-        "sent": 2812
+        "sent": 2822
       },
       "memory": {
-        "allocated": 64507904,
-        "free": 11594240,
+        "allocated": 63766528,
+        "free": 16363664,
         "reservable": 429785088,
-        "used": 52913664
+        "used": 47402864
       },
       "playingPlayers": 1,
-      "uptime": 28943113
+      "uptime": 57485003
     }
   },
   "options": {
     "applyVolumeAsFilter": false,
     "guildId": "783842591182684180",
-    "nodeIdentifier": "lavalink-host.oktaa.my.id",
     "pauseOnDisconnect": true,
     "selfDeafen": false,
     "selfMute": false,
@@ -205,7 +204,7 @@
   },
   "paused": false,
   "playing": true,
-  "position": 4961045000,
+  "position": 5068485000,
   "queue": {
     "current": {
       "artworkUrl": null,
@@ -238,11 +237,11 @@
   "voiceState": {
     "channelId": "1361971557294932158",
     "event": {
-      "endpoint": "c-sin19-ed14caa3.discord.media:2053",
+      "endpoint": "c-sin14-fa35693a.discord.media:2096",
       "guild_id": "783842591182684180",
-      "token": "52964196e78ac190"
+      "token": "be5aa46a068eb206"
     },
-    "sessionId": "304cd852d302751d7c5de3e250ef32da"
+    "sessionId": "824b8f2a42be5189b552f9479dac594f"
   },
   "volume": 100
 }
