@@ -1,7 +1,7 @@
 const axios = require('axios');
+const prisma = require('../utils/database');
 
 const AI_API_URL = "https://router.bynara.id/v1/chat/completions";
-const AI_MODEL = "glm-5.2-free";
 const AI_API_KEY = process.env.AI_API_KEY; 
 
 if (!AI_API_KEY) {
@@ -15,10 +15,20 @@ if (!AI_API_KEY) {
  */
 async function generateAIResponse(messages, temperature = 0.7) {
     try {
+        let aiModel = "glm-5.2-free";
+        try {
+            const botSettings = await prisma.botSettings.findFirst();
+            if (botSettings && botSettings.aiModel) {
+                aiModel = botSettings.aiModel;
+            }
+        } catch (dbErr) {
+            console.error("[AI Engine] Gagal mengambil aiModel dari database, fallback ke glm-5.2-free", dbErr);
+        }
+
         const response = await axios.post(
             AI_API_URL,
             {
-                model: AI_MODEL,
+                model: aiModel,
                 messages: messages,
                 temperature: temperature,
             },

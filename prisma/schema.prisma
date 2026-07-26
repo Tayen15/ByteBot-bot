@@ -259,6 +259,8 @@ model BotSettings {
   maintenanceMode    Boolean @default(false)
   maintenanceMessage String?
 
+  aiModel String @default("glm-5.2-free")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
