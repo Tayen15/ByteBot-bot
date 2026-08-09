@@ -1,6 +1,6 @@
 const { getLofiSessions } = require('../utils/lofiStorage');
 
-const STREAM_URL = 'https://www.youtube.com/watch?v=qGohtGC5Rtk';
+const STREAM_URL = 'https://radio.loficafe.net/listen/studying/radio.mp3';
 
 module.exports = async (client) => {
      const reconnectLogic = async () => {

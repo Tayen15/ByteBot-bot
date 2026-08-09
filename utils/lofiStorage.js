@@ -23,14 +23,10 @@ async function saveLofiSession(guildId, channelId) {
                });
           }
 
-          // Deactivate any existing active sessions for this guild
-          await prisma.lofiSession.updateMany({
+          // Remove any existing active sessions for this guild to keep database clean
+          await prisma.lofiSession.deleteMany({
                where: {
-                    guildId: guild.id,
-                    isActive: true
-               },
-               data: {
-                    isActive: false
+                    guildId: guild.id
                }
           });
 
@@ -60,14 +56,10 @@ async function removeLofiSession(guildId) {
 
           if (!guild) return;
 
-          // Deactivate all sessions for this guild
-          await prisma.lofiSession.updateMany({
+          // Delete all sessions for this guild
+          await prisma.lofiSession.deleteMany({
                where: {
-                    guildId: guild.id,
-                    isActive: true
-               },
-               data: {
-                    isActive: false
+                    guildId: guild.id
                }
           });
 

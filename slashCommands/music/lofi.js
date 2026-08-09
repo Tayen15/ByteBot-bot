@@ -5,8 +5,7 @@ const {
 } = require("discord.js");
 const { saveLofiSession } = require("../../utils/lofiStorage.js");
 
-// Standard Lofi Stream URL (Lofi Girl)
-const STREAM_URL = "https://www.youtube.com/watch?v=qGohtGC5Rtk";
+const STREAM_URL = "https://radio.loficafe.net/listen/studying/radio.mp3";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -46,7 +45,7 @@ module.exports = {
         if (!player.queue.current) player.destroy();
         return interaction.editReply({
           content:
-            "❌ Could not find the lofi stream or Lavalink node is unavailable.",
+            "❌ **Gagal memutar Lofi!**\nServer musik (Lavalink) kami saat ini sedang diblokir sementara oleh YouTube atau mengalami gangguan jaringan (`Network Unreachable`).\n*Saran: Coba lagi beberapa jam kedepan atau gunakan command musik biasa untuk sumber selain YouTube.*",
         });
       }
 
@@ -77,7 +76,7 @@ module.exports = {
           content:
             "❌ Something went wrong while trying to play the lofi music!",
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   },
 };
