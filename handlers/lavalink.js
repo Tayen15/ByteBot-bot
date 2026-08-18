@@ -12,6 +12,15 @@ const nodes = [
   },
 ];
 
+const LOFI_STREAMS = [
+  "https://radio.loficafe.net/listen/studying/radio.mp3",
+  "https://stream.laut.fm/lofi",
+  "https://stream.laut.fm/lofi-radio",
+  "https://radio.loficafe.net/listen/sleeping/radio.mp3",
+  "https://azurecloud.pvtwebs.com/listen/lilo/radio.mp3",
+  "https://lofiradio24.com/static/audio/sleep-lofi.mp3"
+];
+
 module.exports = (client) => {
   client.manager = new Manager({
     nodes,
@@ -45,6 +54,32 @@ module.exports = (client) => {
       `🎶 [Lavalink] Started playing: ${track.title} in channel ${player.voiceChannel}`,
     );
   });
+
+  const handleTrackFailure = async (player, track, payload) => {
+    if (player.isLofi) {
+      console.log(`⚠️ [Lavalink] Lofi track failed! Attempting fallback...`);
+      player.lofiStreamIndex = (player.lofiStreamIndex + 1) % LOFI_STREAMS.length;
+      const fallbackUrl = LOFI_STREAMS[player.lofiStreamIndex];
+      
+      try {
+        const res = await client.manager.search(fallbackUrl, client.user);
+        if (res.loadType !== "error" && res.loadType !== "empty" && res.tracks.length > 0) {
+          console.log(`✅ [Lavalink] Fallback successful: ${fallbackUrl}`);
+          player.queue.add(res.tracks[0]);
+          player.play();
+          return;
+        }
+      } catch (err) {
+        console.error(`❌ [Lavalink] Fallback search error:`, err);
+      }
+      
+      // If the immediate fallback fails, let it be. 
+      // A more complex backoff could be implemented if needed.
+    }
+  };
+
+  client.manager.on("trackError", handleTrackFailure);
+  client.manager.on("trackStuck", handleTrackFailure);
 
   client.manager.on("queueEnd", (player) => {
     console.log(`⏹️ [Lavalink] Queue ended in channel ${player.voiceChannel}`);

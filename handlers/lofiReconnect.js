@@ -1,6 +1,13 @@
 const { getLofiSessions } = require('../utils/lofiStorage');
 
-const STREAM_URL = 'https://radio.loficafe.net/listen/studying/radio.mp3';
+const LOFI_STREAMS = [
+  "https://radio.loficafe.net/listen/studying/radio.mp3",
+  "https://stream.laut.fm/lofi",
+  "https://stream.laut.fm/lofi-radio",
+  "https://radio.loficafe.net/listen/sleeping/radio.mp3",
+  "https://azurecloud.pvtwebs.com/listen/lilo/radio.mp3",
+  "https://lofiradio24.com/static/audio/sleep-lofi.mp3"
+];
 
 module.exports = async (client) => {
      const reconnectLogic = async () => {
@@ -26,11 +33,26 @@ module.exports = async (client) => {
                     });
 
                     if (player.state !== 'CONNECTED') player.connect();
+                    player.isLofi = true;
+                    player.lofiStreamIndex = 0;
 
-                    const res = await client.manager.search(STREAM_URL, client.user);
-                    if (res.loadType === 'error' || res.loadType === 'empty') continue;
+                    let trackToPlay = null;
+                    for (let i = 0; i < LOFI_STREAMS.length; i++) {
+                         player.lofiStreamIndex = i;
+                         const res = await client.manager.search(LOFI_STREAMS[i], client.user);
+                         if (res.loadType !== 'error' && res.loadType !== 'empty' && res.tracks.length > 0) {
+                              trackToPlay = res.tracks[0];
+                              break;
+                         }
+                    }
 
-                    player.queue.add(res.tracks[0]);
+                    if (!trackToPlay) {
+                         console.log('[LofiReconnect] All streams failed for ' + guild.name);
+                         if (!player.queue.current) player.destroy();
+                         continue;
+                    }
+
+                    player.queue.add(trackToPlay);
 
                     if (!player.playing && !player.paused) {
                          player.play();

@@ -5,7 +5,14 @@ const {
 } = require("discord.js");
 const { saveLofiSession } = require("../../utils/lofiStorage.js");
 
-const STREAM_URL = "https://radio.loficafe.net/listen/studying/radio.mp3";
+const LOFI_STREAMS = [
+  "https://radio.loficafe.net/listen/studying/radio.mp3",
+  "https://stream.laut.fm/lofi",
+  "https://stream.laut.fm/lofi-radio",
+  "https://radio.loficafe.net/listen/sleeping/radio.mp3",
+  "https://azurecloud.pvtwebs.com/listen/lilo/radio.mp3",
+  "https://lofiradio24.com/static/audio/sleep-lofi.mp3"
+];
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,7 +23,7 @@ module.exports = {
     const channel = interaction.member.voice.channel;
     if (!channel) {
       return interaction.reply({
-        content: "❌ Please join a voice channel first!",
+        content: "❌ Please join a voice channel first!", 
         flags: MessageFlags.Ephemeral,
       });
     }
@@ -38,20 +45,31 @@ module.exports = {
       // Connect to voice channel
       if (player.state !== "CONNECTED") player.connect();
 
-      // Search for the track using Magmastream
-      const res = await manager.search(STREAM_URL, interaction.user);
+      player.isLofi = true;
+      player.lofiStreamIndex = 0;
 
-      if (res.loadType === "error" || res.loadType === "empty") {
+      // Try connecting to streams until one works
+      let trackToPlay = null;
+      for (let i = 0; i < LOFI_STREAMS.length; i++) {
+        player.lofiStreamIndex = i;
+        const res = await manager.search(LOFI_STREAMS[i], interaction.user);
+        
+        if (res.loadType !== "error" && res.loadType !== "empty" && res.tracks.length > 0) {
+          trackToPlay = res.tracks[0];
+          break; // Found a working stream!
+        }
+      }
+
+      if (!trackToPlay) {
         if (!player.queue.current) player.destroy();
         return interaction.editReply({
           content:
-            "❌ **Gagal memutar Lofi!**\nServer musik (Lavalink) kami saat ini sedang diblokir sementara oleh YouTube atau mengalami gangguan jaringan (`Network Unreachable`).\n*Saran: Coba lagi beberapa jam kedepan atau gunakan command musik biasa untuk sumber selain YouTube.*",
+            "❌ **Gagal memutar Lofi!**\nSemua sumber Lofi Stream saat ini sedang offline atau mengalami gangguan jaringan.\n*Saran: Coba lagi beberapa jam kedepan atau gunakan command musik biasa.*",
         });
       }
 
       // Add track and play
-      const track = res.tracks[0];
-      player.queue.add(track);
+      player.queue.add(trackToPlay);
 
       if (!player.playing && !player.paused) {
         player.play();
